@@ -13,12 +13,13 @@ class ApplePayService {
 
   /// Your merchant identifier, registered in the Apple Developer portal and
   /// linked to EdfaPay. Sandbox test prefixes are often `merchant.sandbox.`.
-  static const String merchantIdentifier = 'REPLACE_WITH_YOUR_APPLE_MERCHANT_ID';
+  static const String merchantIdentifier =
+      EdfaPayConfig.appleMerchantIdentifier;
 
   final EdfaPayPaymentService _edfaPay;
 
   ApplePayService([EdfaPayPaymentService? edfaPay])
-      : _edfaPay = edfaPay ?? EdfaPayPaymentService();
+    : _edfaPay = edfaPay ?? EdfaPayPaymentService();
 
   /// Whether Apple Pay is available on this device (iOS only).
   bool get isSupported => Platform.isIOS;
@@ -33,8 +34,17 @@ class ApplePayService {
     required String customerPhone,
     required String orderId,
   }) async {
+    final configuredMerchantId = merchantIdentifier.trim();
+    if (configuredMerchantId.isEmpty ||
+        configuredMerchantId == 'REPLACE_WITH_YOUR_APPLE_MERCHANT_ID') {
+      throw StateError(
+        'Apple Pay is not configured. Set a valid merchant identifier in '
+        'EdfaPayConfig.appleMerchantIdentifier.',
+      );
+    }
+
     final token = await _channel.invokeMethod<String>('presentApplePay', {
-      'merchantIdentifier': merchantIdentifier,
+      'merchantIdentifier': configuredMerchantId,
       'amount': amount.toString(),
       'currencyCode': currency,
       'countryCode': countryCode,

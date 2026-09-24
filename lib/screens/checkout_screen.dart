@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:edfapay_pg_plugin/edfapay_pg_sdk.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -148,7 +150,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             'Apple Pay is only available on iOS. Rebuild on a device.');
         setState(() => _isPaying = false);
       }
-    } catch (error) {
+    } catch (error,stackTrace) {
+      log(error.toString(), stackTrace: stackTrace);
       if (mounted) {
         _showMessage('Apple Pay failed: $error');
         setState(() => _isPaying = false);

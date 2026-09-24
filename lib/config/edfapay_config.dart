@@ -10,5 +10,9 @@ class EdfaPayConfig {
   static const String successUrl = 'https://edfapay.com/process-completed';
   static const String failureUrl = 'https://edfapay.com/process-failed';
 
+  /// Temporarily set a static Apple merchant identifier for local testing.
+  /// Replace this with your real merchant identifier from Apple Developer.
+  static const String appleMerchantIdentifier = 'merchant.com.edfahpay.test';
+
   EdfaPayConfig._();
 }

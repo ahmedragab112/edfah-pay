@@ -27,7 +27,17 @@ import PassKit
         result(FlutterMethodNotImplemented)
         return
       }
-      self?.presentApplePay(arguments: call.arguments, result: result)
+      guard let self else {
+        result(
+          FlutterError(
+            code: "APP_DELEGATE_GONE",
+            message: "App delegate unavailable.",
+            details: nil
+          )
+        )
+        return
+      }
+      self.presentApplePay(arguments: call.arguments, result: result)
     }
   }
 
@@ -121,7 +131,7 @@ import PassKit
     return top
   }
 
-  private func sendApplePayResult(_ result: FlutterResult?, value: Any?) {
+  private func sendApplePayResult(_ value: Any?) {
     guard let pending = pendingApplePayResult else { return }
     pendingApplePayResult = nil
     pending(value)
@@ -140,7 +150,7 @@ extension AppDelegate: PKPaymentAuthorizationViewControllerDelegate {
     completion(PKPaymentAuthorizationResult(status: .success, errors: nil))
 
     let token = payment.token.paymentData.base64EncodedString()
-    sendApplePayResult(pendingApplePayResult, value: token)
+    sendApplePayResult(token)
   }
 
   func paymentAuthorizationViewControllerDidFinish(
@@ -148,7 +158,7 @@ extension AppDelegate: PKPaymentAuthorizationViewControllerDelegate {
   ) {
     controller.dismiss(animated: true) { [weak self] in
       if self?.pendingApplePayResult != nil {
-        self?.sendApplePayResult(nil, value: nil)
+        self?.sendApplePayResult(nil)
       }
     }
   }
